@@ -1,4 +1,5 @@
 var serialosc = require('serialosc');
+var Promise = require('promise');
 
 var activeDevice;
 
@@ -48,33 +49,33 @@ grid.refresh = function (led) {
   }
 };
 
-module.exports = function (id, cb) {
+module.exports = function (id) {
   var addEvent = id ? id + ':add' : 'device:add';
-
-  serialosc.start({
-    startDevices: false
-  });
-
-  serialosc.on(addEvent, function (device) {
-    if (activeDevice) {
-      return;
-    }
-    if (device.type != 'grid') {
-      return;
-    }
-    if (device.id.match(/^m\d+$/)) {
-      grid.varibright = true;
-    }
-    activeDevice = device;
-    device.on('initialized', function () {
-      device.on('key', function (press) {
-        grid.keyCb(press.x, press.y, press.s);
-      });
-      grid.ready = true;
-      cb(grid);
+  return new Promise(function (resolve, reject) {
+    serialosc.start({
+      startDevices: false
     });
-    device.start();
-  });
 
-  return grid;
+    serialosc.on(addEvent, function (device) {
+      if (activeDevice) {
+        reject();
+      }
+      if (device.type != 'grid') {
+        reject();
+      }
+      if (device.id.match(/^m\d+$/)) {
+        grid.varibright = true;
+      }
+      activeDevice = device;
+      device.on('initialized', function () {
+        device.on('key', function (press) {
+          grid.keyCb(press.x, press.y, press.s);
+        });
+        grid.ready = true;
+        resolve(grid);
+      });
+      device.start();
+    });
+
+  });
 };

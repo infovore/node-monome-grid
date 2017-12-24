@@ -1,6 +1,6 @@
 var monomeGrid = require('../index');
 
-monomeGrid(function (grid) {
+monomeGrid().then(function (grid) {
   grid.key(function (x, y, s) {
     console.log('x: ' + x + ', y: ' + y + ', s: ' + s);
   });

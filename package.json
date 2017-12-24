@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/dinchak/node-monome-grid",
   "dependencies": {
-    "serialosc": "0.0.4"
+    "serialosc": "0.0.4",
+    "promise": "8.0.1"
   }
 }
